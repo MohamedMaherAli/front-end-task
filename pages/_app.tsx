@@ -1,6 +1,28 @@
-import '@/styles/globals.css'
-import type { AppProps } from 'next/app'
+import Nav from '@/components/Nav';
+import '@/styles/globals.css';
+import type { AppProps, AppContext } from 'next/app';
+import { Store } from '@/types/types';
+import { getStore } from '@/api/user';
 
-export default function App({ Component, pageProps }: AppProps) {
-  return <Component {...pageProps} />
+interface MyAppProps extends AppProps {
+  store: { store: Store };
 }
+
+export default function MyApp({ Component, pageProps, store }: MyAppProps) {
+  return (
+    <>
+      <Nav store={store} />
+      <Component {...pageProps} store={store} />
+    </>
+  );
+}
+
+MyApp.getInitialProps = () => {
+  if (typeof window === undefined) {
+    //server
+    return { store: { users: [], currentUser: null } };
+  } else {
+    //client
+    return { store: getStore() };
+  }
+};
